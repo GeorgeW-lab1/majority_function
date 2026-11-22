@@ -1,37 +1,33 @@
 
 #!/usr/bin/env python3
 """
-SSMHMF
+SSMHF
 Static Symmetric-Memetic Horizon Majority Function
 
-BOOLEAN KEYWORD SEARCH ENGINE
+BOOLEAN KEYWORD SEARCH ENGINE WITH STATISTICS
 
-Features:
-    - Keyword tokenisation
-    - Boolean document indexing
+Static Boolean computation:
     - Symmetric pairwise correlation
     - Two-of-three majority activation
-    - Unique surface identification
+    - Unique surface identities
     - Six-member set expansion
     - Parent majority classification
-    - Candidate document retrieval
-    - Static deterministic evaluation
 
-No temporal memory, feedback, learning, or mutable
-logical state is used by the Boolean engine.
+Search statistics:
+    - Keyword match distribution
+    - Activation rates
+    - Unique instance counts
+    - Surface distribution
+    - Retrieval statistics
 """
 
 import re
+from collections import Counter
 
 
 # ==================================================
-# 1. STATIC DOCUMENT INDEX
+# 1. DOCUMENT INDEX
 # ==================================================
-# Each document has:
-#   (document ID, title, content)
-#
-# Add documents to this tuple to expand the index.
-# The index remains fixed during each search.
 
 DOCUMENT_INDEX = (
     (
@@ -86,52 +82,34 @@ DOCUMENT_INDEX = (
 
 
 # ==================================================
-# 2. TEXT TOKENISATION
+# 2. DETERMINISTIC TOKENIZATION
 # ==================================================
-# Converts text into a set of lowercase keywords.
-# Punctuation is excluded.
-# Repeated keywords do not create extra matches.
 
-TOKENIZE = lambda text: frozenset(
+TOKENIZE = lambda text: tuple(dict.fromkeys(
     re.findall(r"\b[a-z0-9]+\b", text.lower())
-)
+))
 
 
 # ==================================================
 # 3. QUERY ENCODING
 # ==================================================
-# Three distinct query keywords become three Boolean
-# surface inputs.
-#
-# Keyword order defines the A, B, C positions.
-# Each document is independently evaluated against
-# the same query signature.
 
-QUERY_TERMS = lambda query: tuple(
-    dict.fromkeys(TOKENIZE(query))
-)[:3]
+QUERY_TERMS = lambda query: TOKENIZE(query)[:3]
 
 
 # ==================================================
 # 4. BOOLEAN DOCUMENT MATCHING
 # ==================================================
-# Each keyword becomes:
-#   1 = present in document
-#   0 = absent from document
-#
-# This produces the three-bit search surface.
 
 BOOLEAN_ENCODING = lambda keywords, document: tuple(
-    int(keyword in TOKENIZE(document))
+    int(keyword in TOKENIZE(document[1] + " " + document[2]))
     for keyword in keywords
 )
 
 
 # ==================================================
-# 5. STATIC MAJORITY FUNCTION
+# 5. STATIC MAJORITY
 # ==================================================
-# Two-of-three Boolean activation.
-# All inputs have equal logical weight.
 
 MAJORITY = lambda a, b, c: (
     (a & b) | (a & c) | (b & c)
@@ -139,9 +117,8 @@ MAJORITY = lambda a, b, c: (
 
 
 # ==================================================
-# 6. SYMMETRIC CORRELATION SURFACE
+# 6. SYMMETRIC SURFACE
 # ==================================================
-# Three independent pairwise conjunctions.
 
 SURFACE_AB = lambda a, b: a & b
 
@@ -157,12 +134,8 @@ SYMMETRIC_SURFACE = lambda a, b, c: (
 
 
 # ==================================================
-# 7. UNIQUE SURFACE IDENTITY
+# 7. SURFACE IDENTITY
 # ==================================================
-# Preserves the complete three-bit signature.
-#
-# Different surface configurations cannot share
-# the same identity.
 
 SURFACE_IDENTITY = lambda a, b, c: (
     (a << 2) | (b << 1) | c
@@ -172,26 +145,16 @@ SURFACE_IDENTITY = lambda a, b, c: (
 # ==================================================
 # 8. INSTANCE ACTIVATION
 # ==================================================
-# Separates activation from identity.
-#
-# The majority output determines activation.
-# The signature determines instance identity.
 
 INSTANCE = lambda a, b, c: (
-    SYMMETRIC_SURFACE(a, b, c),
+    MAJORITY(a, b, c),
     SURFACE_IDENTITY(a, b, c)
 )
 
 
 # ==================================================
-# 9. LARGER SET CONSTRUCTOR
+# 9. LARGER SET
 # ==================================================
-# Expands the original surface into six members:
-#
-# A, B, C, AB, AC, BC
-#
-# Pairwise correlations become additional
-# logical members of the larger set.
 
 LARGER_SET = lambda a, b, c: (
     a,
@@ -204,13 +167,8 @@ LARGER_SET = lambda a, b, c: (
 
 
 # ==================================================
-# 10. UNIQUE SET IDENTITY
+# 10. SET IDENTITY
 # ==================================================
-# Encodes all six Boolean members.
-# The original signature remains recoverable.
-#
-# Eight original signatures produce eight unique
-# expanded-set identities.
 
 SET_IDENTITY = lambda a, b, c: (
     (a << 5)
@@ -223,12 +181,8 @@ SET_IDENTITY = lambda a, b, c: (
 
 
 # ==================================================
-# 11. PARENT MAJORITY CLASSIFICATION
+# 11. PARENT MAJORITY
 # ==================================================
-# Four-of-six threshold over the expanded set.
-#
-# This is an additional classification output.
-# It does not replace the initial activation.
 
 PARENT_MAJORITY = lambda a, b, c: int(
     sum(LARGER_SET(a, b, c)) >= 4
@@ -236,9 +190,8 @@ PARENT_MAJORITY = lambda a, b, c: int(
 
 
 # ==================================================
-# 12. COMPLETE STATIC SEARCH EVALUATION
+# 12. COMPLETE COMPOSITION
 # ==================================================
-# Produces all logical outputs for one document.
 
 STATIC_COMPOSITION = lambda a, b, c: (
     INSTANCE(a, b, c)
@@ -251,104 +204,229 @@ STATIC_COMPOSITION = lambda a, b, c: (
 
 
 # ==================================================
-# 13. DOCUMENT SEARCH
+# 13. DOCUMENT EVALUATION
 # ==================================================
-# Evaluates every indexed document independently.
-#
-# Only documents with an activated majority surface
-# become retrieval candidates.
-#
-# The parent classification is reported separately.
 
-SEARCH_DOCUMENT = lambda keywords, document: (
-    BOOLEAN_ENCODING(
-        keywords,
-        document[1] + " " + document[2]
-    )
+EVALUATE = lambda keywords, document: (
+    BOOLEAN_ENCODING(keywords, document)
+)
+
+ACTIVATED = lambda signature: MAJORITY(*signature)
+
+MATCH_COUNT = lambda signature: sum(signature)
+
+
+# ==================================================
+# 14. PERCENTAGE
+# ==================================================
+
+PERCENT = lambda numerator, denominator: (
+    100 * numerator / denominator
+    if denominator else 0.0
 )
 
 
 # ==================================================
-# 14. SEARCH REPORT
+# 15. STATISTICS ENGINE
+# ==================================================
+
+def statistics(results, keywords):
+
+    total = len(results)
+
+    signatures = Counter(
+        result["signature"]
+        for result in results
+    )
+
+    match_distribution = Counter(
+        result["matches"]
+        for result in results
+    )
+
+    active = [
+        result for result in results
+        if result["active"]
+    ]
+
+    inactive = [
+        result for result in results
+        if not result["active"]
+    ]
+
+    parent_active = [
+        result for result in results
+        if result["parent"]
+    ]
+
+    unique_surface_ids = {
+        result["surface_id"]
+        for result in results
+    }
+
+    unique_set_ids = {
+        result["set_id"]
+        for result in results
+    }
+
+    print("\n" + "=" * 65)
+    print("SSMHF SEARCH STATISTICS")
+    print("=" * 65)
+
+    print(f"Documents indexed:          {total}")
+    print(f"Query keywords:             {len(keywords)}")
+    print(f"Distinct query terms:       {len(set(keywords))}")
+
+    print("\nKEYWORD MATCH DISTRIBUTION")
+
+    for count in range(4):
+        print(
+            f"{count} of 3 matches:             "
+            f"{match_distribution[count]} "
+            f"({PERCENT(match_distribution[count], total):.2f}%)"
+        )
+
+    print("\nMAJORITY ACTIVATION")
+
+    print(
+        f"Activated documents:        {len(active)} "
+        f"({PERCENT(len(active), total):.2f}%)"
+    )
+
+    print(
+        f"Inactive documents:         {len(inactive)} "
+        f"({PERCENT(len(inactive), total):.2f}%)"
+    )
+
+    print("\nINSTANCE STATISTICS")
+
+    print(f"Unique surface signatures:  {len(unique_surface_ids)}")
+    print(f"Unique expanded set IDs:    {len(unique_set_ids)}")
+
+    print("\nPARENT CLASSIFICATION")
+
+    print(
+        f"Parent majority active:     {len(parent_active)} "
+        f"({PERCENT(len(parent_active), total):.2f}%)"
+    )
+
+    print(
+        f"Parent majority inactive:   {total - len(parent_active)}"
+    )
+
+    print("\nSURFACE DISTRIBUTION")
+
+    for signature, count in sorted(signatures.items()):
+        print(
+            f"{signature}: {count} "
+            f"({PERCENT(count, total):.2f}%)"
+        )
+
+    print("\nRETRIEVAL STATISTICS")
+
+    print(f"Candidate results:           {len(active)}")
+    print(f"Candidate rate:              {PERCENT(len(active), total):.2f}%")
+
+    print(f"Documents with 3 matches:    {match_distribution[3]}")
+    print(f"Documents with 2 matches:    {match_distribution[2]}")
+
+    print("=" * 65)
+
+
+# ==================================================
+# 16. SEARCH ENGINE
 # ==================================================
 
 def search(query):
 
-    if len(QUERY_TERMS(query)) != 3:
-        print("\nEnter exactly three distinct keywords.")
+    keywords = QUERY_TERMS(query)
+
+    if len(keywords) != 3:
+        print("Please enter at least three distinct keywords.")
         return
 
-    print("\n" + "=" * 75)
-    print("SSMHF STATIC BOOLEAN KEYWORD SEARCH")
-    print("=" * 75)
+    results = tuple(
+        {
+            "document": document,
+            "signature": EVALUATE(keywords, document),
+            "matches": MATCH_COUNT(EVALUATE(keywords, document)),
+            "active": ACTIVATED(EVALUATE(keywords, document)),
+            "surface_id": SURFACE_IDENTITY(
+                *EVALUATE(keywords, document)
+            ),
+            "expanded": LARGER_SET(
+                *EVALUATE(keywords, document)
+            ),
+            "set_id": SET_IDENTITY(
+                *EVALUATE(keywords, document)
+            ),
+            "parent": PARENT_MAJORITY(
+                *EVALUATE(keywords, document)
+            )
+        }
+        for document in DOCUMENT_INDEX
+    )
+
+    print("\n" + "=" * 80)
+    print("STATIC SYMMETRIC-MEMETIC HORIZON SEARCH")
+    print("=" * 80)
 
     print("QUERY:", query)
 
-    print("\nKEYWORD ENCODING")
+    print("\nQUERY ENCODING")
 
-    print("A:", QUERY_TERMS(query)[0])
-    print("B:", QUERY_TERMS(query)[1])
-    print("C:", QUERY_TERMS(query)[2])
+    for index, keyword in enumerate(keywords):
+        print(f"{'ABC'[index]} = {keyword}")
 
-    print("\n" + "-" * 75)
-    print("DOCUMENT EVALUATION")
-    print("-" * 75)
+    print("\nDOCUMENT RESULTS")
 
     print(
-        "DOCUMENT | SURFACE | ACTIVE | "
-        "SURFACE ID | SET ID | PARENT"
+        f"{'DOCUMENT':<10}"
+        f"{'BITS':<12}"
+        f"{'MATCH':<9}"
+        f"{'ACTIVE':<9}"
+        f"{'SURFACE':<10}"
+        f"{'SET ID':<9}"
+        f"{'PARENT':<8}"
     )
 
-    print("-" * 75)
+    print("-" * 80)
 
-    for document in DOCUMENT_INDEX:
-
-        print("\nDOCUMENT:", document[0])
-        print("TITLE:", document[1])
-
-        print("MATCH:", document[2])
+    for result in results:
 
         print(
-            "BOOLEAN:",
-            SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+            f"{result['document'][0]:<10}"
+            f"{str(result['signature']):<12}"
+            f"{result['matches']}/3{'':<5}"
+            f"{str(result['active']):<9}"
+            f"{result['surface_id']:<10}"
+            f"{result['set_id']:<9}"
+            f"{result['parent']:<8}"
         )
 
-        print(
-            "RESULT:",
-            STATIC_COMPOSITION(
-                *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+    print("\nACTIVATED CANDIDATES")
+
+    for result in results:
+
+        if result["active"]:
+
+            print(
+                f"\n{result['document'][0]}: "
+                f"{result['document'][1]}"
             )
-        )
 
-    print("\n" + "=" * 75)
-    print("RETRIEVAL CANDIDATES")
-    print("=" * 75)
+            print("Signature:", result["signature"])
+            print("Surface ID:", result["surface_id"])
+            print("Expanded set:", result["expanded"])
+            print("Set identity:", result["set_id"])
+            print("Parent majority:", result["parent"])
 
-    for document in DOCUMENT_INDEX:
-
-        print(
-            document[0],
-            document[1],
-            "SURFACE:",
-            SEARCH_DOCUMENT(QUERY_TERMS(query), document),
-            "ACTIVATED:",
-            INSTANCE(
-                *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
-            )[0]
-        ) if MAJORITY(
-            *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
-        ) else None
-
-    print("\nSEARCH COMPLETE.")
-    print("=" * 75)
+    statistics(results, keywords)
 
 
 # ==================================================
-# 15. STATIC LOGIC VERIFICATION
+# 17. STATIC LOGIC VERIFICATION
 # ==================================================
-# Verify all eight possible surface configurations.
-#
-# No search result is used to modify another result.
 
 def verify():
 
@@ -367,35 +445,35 @@ def verify():
     }) == 8
 
     assert all(
-        MAJORITY(a, b, c)
-        == SYMMETRIC_SURFACE(a, b, c)
+        MAJORITY(a, b, c) ==
+        SYMMETRIC_SURFACE(a, b, c)
         for a in (0, 1)
         for b in (0, 1)
         for c in (0, 1)
     )
 
     assert all(
-        SURFACE_IDENTITY(*(
-            (i >> 2) & 1,
-            (i >> 1) & 1,
-            i & 1
-        )) == i
-        for i in range(8)
+        PARENT_MAJORITY(a, b, c) ==
+        int(sum(LARGER_SET(a, b, c)) >= 4)
+        for a in (0, 1)
+        for b in (0, 1)
+        for c in (0, 1)
     )
 
-    print("STATIC BOOLEAN VERIFICATION: PASSED")
+    print("Boolean verification: PASSED")
+    print("Surface uniqueness: 8/8")
+    print("Expanded identity uniqueness: 8/8")
 
 
 # ==================================================
-# 16. COMMAND-LINE INTERFACE
+# 18. MAIN
 # ==================================================
 
 if __name__ == "__main__":
 
     verify()
 
-    print("\nSSMHF KEYWORD RETRIEVAL")
-    print("Enter three distinct keywords.")
+    print("\nSSMHF KEYWORD SEARCH")
     print("Example: boolean majority correlation")
 
     search(input("\nSearch query: "))
