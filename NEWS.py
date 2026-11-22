@@ -1,35 +1,137 @@
 
 #!/usr/bin/env python3
 """
-STATIC SYMMETRIC-MEMETIC HORIZON
-HIERARCHICAL MAJORITY INSTANCE CONSTRUCTOR
+SSMHMF
+Static Symmetric-Memetic Horizon Majority Function
 
-Architecture:
-    Unique Boolean input
-        -> Correlated surface
-        -> Symmetric majority
-        -> Unique instance identity
-        -> Larger set construction
-        -> Parent majority classification
+BOOLEAN KEYWORD SEARCH ENGINE
 
-Properties:
-    - Static Boolean logic
-    - No temporal memory
-    - No feedback
-    - No iterative state updates
-    - No mutable state
-    - No runtime-generated identities
-    - Deterministic instance identification
+Features:
+    - Keyword tokenisation
+    - Boolean document indexing
+    - Symmetric pairwise correlation
+    - Two-of-three majority activation
+    - Unique surface identification
+    - Six-member set expansion
+    - Parent majority classification
+    - Candidate document retrieval
+    - Static deterministic evaluation
+
+No temporal memory, feedback, learning, or mutable
+logical state is used by the Boolean engine.
 """
 
-from itertools import product
+import re
 
 
 # ==================================================
-# 1. STATIC MAJORITY FUNCTION
+# 1. STATIC DOCUMENT INDEX
 # ==================================================
-# Activates when at least two of three inputs are 1.
-# Every input has equal logical weight.
+# Each document has:
+#   (document ID, title, content)
+#
+# Add documents to this tuple to expand the index.
+# The index remains fixed during each search.
+
+DOCUMENT_INDEX = (
+    (
+        "DOC001",
+        "Symmetric Boolean Logic",
+        "majority function boolean logic symmetric "
+        "correlation surface pairwise conjunction"
+    ),
+    (
+        "DOC002",
+        "Hierarchical Set Construction",
+        "hierarchical boolean sets unique identity "
+        "surface activation larger set construction"
+    ),
+    (
+        "DOC003",
+        "Keyword Search Architecture",
+        "keyword search document retrieval query "
+        "matching boolean indexing"
+    ),
+    (
+        "DOC004",
+        "Memetic Horizon",
+        "memetic horizon majority correlation "
+        "surface targeting logical instance"
+    ),
+    (
+        "DOC005",
+        "Static Combinational Logic",
+        "static boolean combinational logic "
+        "deterministic majority gates"
+    ),
+    (
+        "DOC006",
+        "Correlation and Classification",
+        "correlation classification keyword "
+        "matching pairwise majority function"
+    ),
+    (
+        "DOC007",
+        "Instance Identification",
+        "unique instance identity boolean signature "
+        "larger set identification"
+    ),
+    (
+        "DOC008",
+        "Document Retrieval",
+        "document search retrieval indexed "
+        "keywords query classification"
+    ),
+)
+
+
+# ==================================================
+# 2. TEXT TOKENISATION
+# ==================================================
+# Converts text into a set of lowercase keywords.
+# Punctuation is excluded.
+# Repeated keywords do not create extra matches.
+
+TOKENIZE = lambda text: frozenset(
+    re.findall(r"\b[a-z0-9]+\b", text.lower())
+)
+
+
+# ==================================================
+# 3. QUERY ENCODING
+# ==================================================
+# Three distinct query keywords become three Boolean
+# surface inputs.
+#
+# Keyword order defines the A, B, C positions.
+# Each document is independently evaluated against
+# the same query signature.
+
+QUERY_TERMS = lambda query: tuple(
+    dict.fromkeys(TOKENIZE(query))
+)[:3]
+
+
+# ==================================================
+# 4. BOOLEAN DOCUMENT MATCHING
+# ==================================================
+# Each keyword becomes:
+#   1 = present in document
+#   0 = absent from document
+#
+# This produces the three-bit search surface.
+
+BOOLEAN_ENCODING = lambda keywords, document: tuple(
+    int(keyword in TOKENIZE(document))
+    for keyword in keywords
+)
+
+
+# ==================================================
+# 5. STATIC MAJORITY FUNCTION
+# ==================================================
+# Two-of-three Boolean activation.
+# All inputs have equal logical weight.
 
 MAJORITY = lambda a, b, c: (
     (a & b) | (a & c) | (b & c)
@@ -37,15 +139,9 @@ MAJORITY = lambda a, b, c: (
 
 
 # ==================================================
-# 2. SYMMETRIC SURFACE FUNCTION
+# 6. SYMMETRIC CORRELATION SURFACE
 # ==================================================
-# Detects pairwise Boolean correlations.
-#
-# AB, AC and BC are independent conjunctions.
-# Their OR produces the surface activation.
-#
-# The individual conjunctions are retained separately
-# for instance identification.
+# Three independent pairwise conjunctions.
 
 SURFACE_AB = lambda a, b: a & b
 
@@ -61,16 +157,12 @@ SYMMETRIC_SURFACE = lambda a, b, c: (
 
 
 # ==================================================
-# 3. UNIQUE SURFACE IDENTITY
+# 7. UNIQUE SURFACE IDENTITY
 # ==================================================
-# Encodes the complete three-bit surface signature.
+# Preserves the complete three-bit signature.
 #
-# Eight possible signatures exist.
-# Each signature has a distinct integer encoding.
-#
-# The identity is not the majority output.
-# Majority activation and instance identity remain
-# separate logical properties.
+# Different surface configurations cannot share
+# the same identity.
 
 SURFACE_IDENTITY = lambda a, b, c: (
     (a << 2) | (b << 1) | c
@@ -78,36 +170,28 @@ SURFACE_IDENTITY = lambda a, b, c: (
 
 
 # ==================================================
-# 4. INSTANCE ACTIVATION
+# 8. INSTANCE ACTIVATION
 # ==================================================
-# An instance activates when at least two surface
-# inputs are active.
+# Separates activation from identity.
 #
-# The identity is preserved even when the majority
-# result is identical across different signatures.
+# The majority output determines activation.
+# The signature determines instance identity.
 
 INSTANCE = lambda a, b, c: (
-    (
-        SYMMETRIC_SURFACE(a, b, c),
-        SURFACE_IDENTITY(a, b, c)
-    )
+    SYMMETRIC_SURFACE(a, b, c),
+    SURFACE_IDENTITY(a, b, c)
 )
 
 
 # ==================================================
-# 5. LARGER SET CONSTRUCTOR
+# 9. LARGER SET CONSTRUCTOR
 # ==================================================
-# Constructs a complete logical set from an active
-# surface signature.
-#
-# The original three inputs are retained.
-# Pairwise correlations become additional members.
-#
-# The resulting six-bit signature is:
+# Expands the original surface into six members:
 #
 # A, B, C, AB, AC, BC
 #
-# This is a static expansion, not a state transition.
+# Pairwise correlations become additional
+# logical members of the larger set.
 
 LARGER_SET = lambda a, b, c: (
     a,
@@ -120,12 +204,13 @@ LARGER_SET = lambda a, b, c: (
 
 
 # ==================================================
-# 6. LARGER SET IDENTITY
+# 10. UNIQUE SET IDENTITY
 # ==================================================
-# Encodes all six members.
+# Encodes all six Boolean members.
+# The original signature remains recoverable.
 #
-# Different expanded sets receive distinct identities
-# because the original three-bit signature is retained.
+# Eight original signatures produce eight unique
+# expanded-set identities.
 
 SET_IDENTITY = lambda a, b, c: (
     (a << 5)
@@ -138,33 +223,22 @@ SET_IDENTITY = lambda a, b, c: (
 
 
 # ==================================================
-# 7. PARENT MAJORITY CLASSIFICATION
+# 11. PARENT MAJORITY CLASSIFICATION
 # ==================================================
-# Determines whether at least four of six members
-# in the expanded set are active.
+# Four-of-six threshold over the expanded set.
 #
-# This is a six-input majority threshold.
-# The explicit expression avoids loops and variables.
+# This is an additional classification output.
+# It does not replace the initial activation.
 
-PARENT_MAJORITY = lambda a, b, c: (
-    (
-        (sum(LARGER_SET(a, b, c)) >= 4)
-    ) * 1
+PARENT_MAJORITY = lambda a, b, c: int(
+    sum(LARGER_SET(a, b, c)) >= 4
 )
 
 
 # ==================================================
-# 8. COMPLETE STATIC COMPOSITION
+# 12. COMPLETE STATIC SEARCH EVALUATION
 # ==================================================
-# Produces:
-#   1. Surface activation
-#   2. Original surface identity
-#   3. Expanded six-member set
-#   4. Expanded set identity
-#   5. Parent majority classification
-#
-# All outputs are direct Boolean functions
-# of the original inputs.
+# Produces all logical outputs for one document.
 
 STATIC_COMPOSITION = lambda a, b, c: (
     INSTANCE(a, b, c)
@@ -177,68 +251,151 @@ STATIC_COMPOSITION = lambda a, b, c: (
 
 
 # ==================================================
-# 9. EXHAUSTIVE TRUTH TABLE
+# 13. DOCUMENT SEARCH
 # ==================================================
-# Enumerates every possible three-bit surface.
+# Evaluates every indexed document independently.
 #
-# All eight signatures are independently evaluated.
-# No output is fed back into another input.
+# Only documents with an activated majority surface
+# become retrieval candidates.
+#
+# The parent classification is reported separately.
 
-print("=" * 88)
-print("STATIC SYMMETRIC-MEMETIC HORIZON")
-print("=" * 88)
-
-print(
-    "A B C | ACTIVE | SURFACE ID | "
-    "EXPANDED SET | SET ID | PARENT"
+SEARCH_DOCUMENT = lambda keywords, document: (
+    BOOLEAN_ENCODING(
+        keywords,
+        document[1] + " " + document[2]
+    )
 )
 
-print("-" * 88)
 
-for a, b, c in product((0, 1), repeat=3):
+# ==================================================
+# 14. SEARCH REPORT
+# ==================================================
+
+def search(query):
+
+    if len(QUERY_TERMS(query)) != 3:
+        print("\nEnter exactly three distinct keywords.")
+        return
+
+    print("\n" + "=" * 75)
+    print("SSMHF STATIC BOOLEAN KEYWORD SEARCH")
+    print("=" * 75)
+
+    print("QUERY:", query)
+
+    print("\nKEYWORD ENCODING")
+
+    print("A:", QUERY_TERMS(query)[0])
+    print("B:", QUERY_TERMS(query)[1])
+    print("C:", QUERY_TERMS(query)[2])
+
+    print("\n" + "-" * 75)
+    print("DOCUMENT EVALUATION")
+    print("-" * 75)
 
     print(
-        a, b, c, "|",
-        INSTANCE(a, b, c)[0], "|",
-        INSTANCE(a, b, c)[1], "|",
-        LARGER_SET(a, b, c), "|",
-        SET_IDENTITY(a, b, c), "|",
-        PARENT_MAJORITY(a, b, c)
+        "DOCUMENT | SURFACE | ACTIVE | "
+        "SURFACE ID | SET ID | PARENT"
     )
 
+    print("-" * 75)
+
+    for document in DOCUMENT_INDEX:
+
+        print("\nDOCUMENT:", document[0])
+        print("TITLE:", document[1])
+
+        print("MATCH:", document[2])
+
+        print(
+            "BOOLEAN:",
+            SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+        )
+
+        print(
+            "RESULT:",
+            STATIC_COMPOSITION(
+                *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+            )
+        )
+
+    print("\n" + "=" * 75)
+    print("RETRIEVAL CANDIDATES")
+    print("=" * 75)
+
+    for document in DOCUMENT_INDEX:
+
+        print(
+            document[0],
+            document[1],
+            "SURFACE:",
+            SEARCH_DOCUMENT(QUERY_TERMS(query), document),
+            "ACTIVATED:",
+            INSTANCE(
+                *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+            )[0]
+        ) if MAJORITY(
+            *SEARCH_DOCUMENT(QUERY_TERMS(query), document)
+        ) else None
+
+    print("\nSEARCH COMPLETE.")
+    print("=" * 75)
+
 
 # ==================================================
-# 10. STATIC UNIQUENESS VERIFICATION
+# 15. STATIC LOGIC VERIFICATION
 # ==================================================
-# Confirms that every original surface signature
-# produces a different expanded-set identity.
+# Verify all eight possible surface configurations.
 #
-# The mapping is injective because the original
-# three-bit signature is retained in the six-bit set.
+# No search result is used to modify another result.
 
-assert len({
-    SET_IDENTITY(a, b, c)
-    for a, b, c in product((0, 1), repeat=3)
-}) == 8
+def verify():
 
-# Confirms that all surface identities are unique.
+    assert len({
+        SURFACE_IDENTITY(a, b, c)
+        for a in (0, 1)
+        for b in (0, 1)
+        for c in (0, 1)
+    }) == 8
 
-assert len({
-    SURFACE_IDENTITY(a, b, c)
-    for a, b, c in product((0, 1), repeat=3)
-}) == 8
+    assert len({
+        SET_IDENTITY(a, b, c)
+        for a in (0, 1)
+        for b in (0, 1)
+        for c in (0, 1)
+    }) == 8
 
-# Confirms that majority activation agrees with
-# the symmetric pairwise surface function.
+    assert all(
+        MAJORITY(a, b, c)
+        == SYMMETRIC_SURFACE(a, b, c)
+        for a in (0, 1)
+        for b in (0, 1)
+        for c in (0, 1)
+    )
 
-assert all(
-    MAJORITY(a, b, c) == SYMMETRIC_SURFACE(a, b, c)
-    for a, b, c in product((0, 1), repeat=3)
-)
+    assert all(
+        SURFACE_IDENTITY(*(
+            (i >> 2) & 1,
+            (i >> 1) & 1,
+            i & 1
+        )) == i
+        for i in range(8)
+    )
 
-print("-" * 88)
-print("SURFACE IDENTITIES: 8 UNIQUE")
-print("EXPANDED SET IDENTITIES: 8 UNIQUE")
-print("MAJORITY/SURFACE EQUIVALENCE: VERIFIED")
-print("STATIC LOGIC: VERIFIED")
-print("=" * 88)
+    print("STATIC BOOLEAN VERIFICATION: PASSED")
+
+
+# ==================================================
+# 16. COMMAND-LINE INTERFACE
+# ==================================================
+
+if __name__ == "__main__":
+
+    verify()
+
+    print("\nSSMHF KEYWORD RETRIEVAL")
+    print("Enter three distinct keywords.")
+    print("Example: boolean majority correlation")
+
+    search(input("\nSearch query: "))
